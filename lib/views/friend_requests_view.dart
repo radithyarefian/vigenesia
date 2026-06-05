@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:vigenesia/controllers/friend_requests_controller.dart';
 import 'package:vigenesia/theme/app_theme.dart';
@@ -102,7 +101,6 @@ class FriendRequestsView extends GetView<FriendRequestsController> {
               ),
             ),
           ),
-
           Expanded(
             child: Obx(() {
               return IndexedStack(
@@ -122,9 +120,9 @@ class FriendRequestsView extends GetView<FriendRequestsController> {
   Widget _buildReceivedRequestsTab() {
     return Obx(() {
       if (controller.receivedRequests.isEmpty) {
-        return _buildEmptyState(    
+        return _buildEmptyState(
           icon: Icons.inbox_outlined,
-          Title: 'Tidak ada permintaan pertemanan',
+          title: 'Tidak ada permintaan pertemanan',
           message:
               'Ketika seseorang mengirimkan permintaan pertemanan kepada Anda, permintaan tersebut akan muncul di sini',
         );
@@ -137,9 +135,7 @@ class FriendRequestsView extends GetView<FriendRequestsController> {
         itemBuilder: (context, index) {
           final request = controller.receivedRequests[index];
           final sender = controller.getUser(request.senderId);
-          if (sender == null) {
-            return SizedBox.shrink();
-          }
+          if (sender == null) return SizedBox.shrink();
 
           return FriendRequestItem(
             request: request,
@@ -156,24 +152,25 @@ class FriendRequestsView extends GetView<FriendRequestsController> {
 
   Widget _buildSentRequestsTab() {
     return Obx(() {
-      if (controller.receivedRequests.isEmpty) {
+      // ✅ FIX: cek sentRequests bukan receivedRequests
+      if (controller.sentRequests.isEmpty) {
         return _buildEmptyState(
-          icon: Icons.inbox_outlined,
-          Title: 'Tidak Ada Permintaan yang Dikirim',
+          icon: Icons.send_outlined,
+          title: 'Tidak Ada Permintaan yang Dikirim',
           message:
               'Permintaan pertemanan yang Anda kirimkan akan muncul di sini',
         );
       }
+
       return ListView.separated(
         padding: EdgeInsets.all(16),
         itemCount: controller.sentRequests.length,
         separatorBuilder: (context, index) => SizedBox(height: 8),
         itemBuilder: (context, index) {
           final request = controller.sentRequests[index];
-          final receiver = controller.getUser(request.senderId);
-          if (receiver == null) {
-            return SizedBox.shrink();
-          }
+          // ✅ FIX: untuk sent requests, tampilkan receiverId bukan senderId
+          final receiver = controller.getUser(request.receiverId);
+          if (receiver == null) return SizedBox.shrink();
 
           return FriendRequestItem(
             request: request,
@@ -190,7 +187,7 @@ class FriendRequestsView extends GetView<FriendRequestsController> {
 
   Widget _buildEmptyState({
     required IconData icon,
-    required String Title,
+    required String title,
     required String message,
   }) {
     return Center(
@@ -210,16 +207,18 @@ class FriendRequestsView extends GetView<FriendRequestsController> {
             ),
             SizedBox(height: 24),
             Text(
-              Title,
+              title,
               style: Get.textTheme.headlineSmall?.copyWith(
                 color: AppTheme.textPrimaryColor,
+                fontWeight: FontWeight.bold,
               ),
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 8),
             Text(
-              Title,
+              message,
               style: Get.textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textPrimaryColor,
+                color: AppTheme.textSecondaryColor,
               ),
               textAlign: TextAlign.center,
             ),

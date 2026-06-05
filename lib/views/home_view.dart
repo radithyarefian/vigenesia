@@ -58,10 +58,7 @@ class HomeView extends GetView<HomeController> {
       foregroundColor: AppTheme.textPrimaryColor,
       elevation: 0,
       title: Obx(
-        () => Text(
-          controller.isSearching ? 'Search Results' : "Messages",
-          // style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-        ),
+        () => Text(controller.isSearching ? 'Hasil Pencarian' : "Pesan"),
       ),
       automaticallyImplyLeading: false,
       actions: [
@@ -177,7 +174,7 @@ class HomeView extends GetView<HomeController> {
           children: [
             Obx(
               () => _buildFilterChip(
-                'All',
+                'Semua',
                 () => controller.setFilter('All'),
                 controller.activeFilter == 'All',
               ),
@@ -185,7 +182,7 @@ class HomeView extends GetView<HomeController> {
             SizedBox(width: 8),
             Obx(
               () => _buildFilterChip(
-                'Unread (${controller.getUnreadCount()})',
+                'Belum Dibaca (${controller.getUnreadCount()})',
                 () => controller.setFilter('Unread'),
                 controller.activeFilter == 'Unread',
               ),
@@ -193,7 +190,7 @@ class HomeView extends GetView<HomeController> {
             SizedBox(width: 8),
             Obx(
               () => _buildFilterChip(
-                'Recent (${controller.getRecentCount()})',
+                'Terbaru (${controller.getRecentCount()})',
                 () => controller.setFilter('Recent'),
                 controller.activeFilter == 'Recent',
               ),
@@ -201,7 +198,7 @@ class HomeView extends GetView<HomeController> {
             SizedBox(width: 8),
             Obx(
               () => _buildFilterChip(
-                'Active (${controller.getActiveCount()})',
+                'Aktif (${controller.getActiveCount()})',
                 () => controller.setFilter('Active'),
                 controller.activeFilter == 'Active',
               ),
@@ -242,7 +239,7 @@ class HomeView extends GetView<HomeController> {
         children: [
           Obx(
             () => Text(
-              'Found ${controller.filteredChats.length}result${controller.filteredChats.length == 1 ? '' : 's'}',
+              'Ditemukan ${controller.filteredChats.length} hasil',
               style: TextStyle(
                 fontSize: 14,
                 color: AppTheme.textSecondaryColor,
@@ -253,7 +250,7 @@ class HomeView extends GetView<HomeController> {
           TextButton(
             onPressed: controller.clearSeacrh,
             child: Text(
-              'Clear',
+              'Hapus',
               style: TextStyle(
                 color: AppTheme.primaryColor,
                 fontWeight: FontWeight.w500,
@@ -327,12 +324,14 @@ class HomeView extends GetView<HomeController> {
               ),
               SizedBox(height: 16),
               Text(
-                'No ${controller.activeFilter.toLowerCase()} conversations',
+                'Tidak ada percakapan ${_getFilterDisplayName(controller.activeFilter)}',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.textPrimaryColor,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: 8),
               Text(
@@ -351,7 +350,7 @@ class HomeView extends GetView<HomeController> {
                     borderRadius: BorderRadiusGeometry.circular(12),
                   ),
                 ),
-                child: Text("Tampilkan Semua Percakapan"),
+                child: Text("Lihat Semua Percakapan"),
               ),
             ],
           ),
@@ -373,16 +372,29 @@ class HomeView extends GetView<HomeController> {
     }
   }
 
+  String _getFilterDisplayName(String filter) {
+    switch (filter) {
+      case 'Unread':
+        return 'belum dibaca';
+      case 'Recent':
+        return 'terbaru';
+      case 'Active':
+        return 'aktif';
+      default:
+        return '';
+    }
+  }
+
   String _getFilterEmptyMessage(String filter) {
     switch (filter) {
       case 'Unread':
-        return 'All your conversations are up to date';
+        return 'Semua percakapan Anda sudah terbaca';
       case 'Recent':
-        return 'No conversations from the list 3 days';
+        return 'Tidak ada percakapan dalam 3 hari terakhir';
       case 'Active':
-        return 'No conversations from the last week';
+        return 'Tidak ada percakapan dalam seminggu terakhir';
       default:
-        return 'No conversations found';
+        return 'Tidak ada percakapan ditemukan';
     }
   }
 
@@ -442,16 +454,16 @@ class HomeView extends GetView<HomeController> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Obx(() {
-            String title = 'Recent Chats';
+            String title = 'Chat Terbaru';
             switch (controller.activeFilter) {
               case 'Unread':
-                title = 'Unread Messages';
+                title = 'Pesan Belum Dibaca';
                 break;
               case 'Recent':
-                title = 'Recent Messages';
+                title = 'Pesan Terbaru';
                 break;
               case 'Active':
-                title = 'Active Messages';
+                title = 'Pesan Aktif';
                 break;
             }
             return Text(
@@ -470,7 +482,7 @@ class HomeView extends GetView<HomeController> {
                 TextButton(
                   onPressed: controller.clearAllFilters,
                   child: Text(
-                    'Clear Filter',
+                    'Hapus Filter',
                     style: TextStyle(
                       color: AppTheme.primaryColor,
                       fontWeight: FontWeight.w500,
@@ -507,7 +519,7 @@ class HomeView extends GetView<HomeController> {
         elevation: 0,
         icon: Icon(Icons.chat_rounded, size: 20),
         label: Text(
-          "New Chat",
+          "Chat Baru",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
         ),
       ),
@@ -570,7 +582,7 @@ class HomeView extends GetView<HomeController> {
     return Column(
       children: [
         Text(
-          'No conversations yet',
+          'Belum ada percakapan',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -579,7 +591,7 @@ class HomeView extends GetView<HomeController> {
         ),
         SizedBox(height: 8),
         Text(
-          'Connect with friends and start meaningful conversations',
+          'Terhubung dengan teman dan mulai percakapan yang bermakna',
           style: TextStyle(
             fontSize: 15,
             color: AppTheme.textSecondaryColor,
@@ -612,7 +624,7 @@ class HomeView extends GetView<HomeController> {
             ),
             icon: Icon(Icons.person_search_rounded),
             label: Text(
-              "Find People",
+              "Cari Orang",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
@@ -635,7 +647,7 @@ class HomeView extends GetView<HomeController> {
             ),
             icon: Icon(Icons.person_search_rounded),
             label: Text(
-              "View Friends",
+              "Lihat Teman",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),

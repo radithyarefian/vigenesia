@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:vigenesia/models/user_model.dart';
@@ -12,7 +13,9 @@ class AuthController extends GetxController {
   final RxBool _isLoading = false.obs;
   final RxString _error = ''.obs;
   final RxBool _isinitialized = false.obs;
+
   User? get user => _user.value;
+  UserModel? get currentUser => _userModel.value;
   UserModel? get userModel => _userModel.value;
   bool get isLoading => _isLoading.value;
   String get error => _error.value;
@@ -23,34 +26,7 @@ class AuthController extends GetxController {
   void onInit() {
     super.onInit();
     _user.bindStream(_authService.authStateChanges);
-    // ever(_user, _handleAuthStateChange);
   }
-
-  // void _handleAuthStateChange(User? user) {
-  //   if (user == null) {
-  //     if (Get.currentRoute != AppRoutes.login) {
-  //       Get.offAllNamed(AppRoutes.login);
-  //     }
-  //   } else {
-  //     if (Get.currentRoute != AppRoutes.profile) {
-  //       Get.offAllNamed(AppRoutes.profile);
-  //     }
-  //   }
-  //   if (!_isinitialized.value) {
-  //     _isinitialized.value = true;
-  //   }
-  // }
-
-  // void checkInitialAuthState() {
-  //   final currentUser = FirebaseAuth.instance.currentUser;
-  //   if (currentUser != null) {
-  //     _user.value = currentUser;
-  //     Get.offAllNamed(AppRoutes.main);
-  //   } else {
-  //     Get.offAllNamed(AppRoutes.login);
-  //   }
-  //   _isinitialized.value = true;
-  // }
 
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     try {
@@ -88,8 +64,11 @@ class AuthController extends GetxController {
         password,
         displayName,
       );
+
       if (userModel != null) {
         _userModel.value = userModel;
+
+        // Masuk ke halaman utama
         Get.offAllNamed(AppRoutes.main);
       }
     } catch (e) {
@@ -100,6 +79,7 @@ class AuthController extends GetxController {
       _isLoading.value = false;
     }
   }
+
 
   Future<void> signOut() async {
     try {
@@ -132,4 +112,8 @@ class AuthController extends GetxController {
   void clearError() {
     _error.value = '';
   }
+
+  void updateCurrentUser(UserModel user) {
+  _userModel.value = user;
+}
 }

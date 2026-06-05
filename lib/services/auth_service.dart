@@ -49,6 +49,10 @@ class AuthService {
           email: email,
           displayName: displayName,
           photoURL: '',
+          profession: '', // BARU
+          bio: '', // BARU
+          latitude: null, // BARU
+          longitude: null, // BARU
           isOnline: true,
           lastSeen: DateTime.now(),
           createdAt: DateTime.now(),

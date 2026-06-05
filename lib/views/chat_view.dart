@@ -18,13 +18,15 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // ← ini juga hilang sebelumnya
     chatId = Get.arguments?['chatId'] ?? '';
 
     if (!Get.isRegistered<ChatController>(tag: chatId)) {
       Get.put<ChatController>(ChatController(), tag: chatId);
-
-      controller = Get.find<ChatController>(tag: chatId);
     }
+
+    // ✅ FIX: dipindah ke luar if, selalu di-assign
+    controller = Get.find<ChatController>(tag: chatId);
   }
 
   @override
@@ -222,7 +224,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                       child: TextField(
                         controller: controller.messageController,
                         decoration: InputDecoration(
-                          hintText: 'Type a message',
+                          hintText: 'Ketik pesan...',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             vertical: 12,
@@ -243,19 +245,19 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
               () => Container(
                 decoration: BoxDecoration(
                   color: controller.isTyping
-                  ? AppTheme.primaryColor
-                  : AppTheme.borderColor,
+                      ? AppTheme.primaryColor
+                      : AppTheme.borderColor,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: IconButton(
                   onPressed: controller.isSending
-                  ? null
-                  : controller.sendMessage,
+                      ? null
+                      : controller.sendMessage,
                   icon: Icon(
                     Icons.send_rounded,
                     color: controller.isTyping
-                    ? Colors.white
-                    : AppTheme.textSecondaryColor,
+                        ? Colors.white
+                        : AppTheme.textSecondaryColor,
                   ),
                 ),
               ),
@@ -353,10 +355,12 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         ),
         actions: [
           TextButton(onPressed: () => Get.back(), child: Text("Batal")),
+          // ✅ SESUDAH
           TextButton(
             onPressed: () {
               if (editController.text.trim().isNotEmpty) {
                 controller.editMessage(message, editController.text.trim());
+                Get.back(); 
               }
             },
             child: Text("Simpan"),

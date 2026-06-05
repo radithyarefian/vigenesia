@@ -3,6 +3,7 @@ import 'package:vigenesia/models/chat_model.dart';
 import 'package:vigenesia/models/friend_request_model.dart';
 import 'package:vigenesia/models/friendship_model.dart';
 import 'package:vigenesia/models/message_model.dart';
+import 'package:vigenesia/models/motivation_model.dart';
 import 'package:vigenesia/models/notification_model.dart';
 import 'package:vigenesia/models/user_model.dart';
 
@@ -219,9 +220,10 @@ class FirestoreService {
         );
   }
 
+  // ✅ FIX: ganti 'friendRequests' → 'friend_requests'
   Stream<List<FriendRequestModel>> getSendFriendRequestsStream(String userId) {
     return _firestore
-        .collection('friendRequests')
+        .collection('friend_requests') // ← DIPERBAIKI
         .where('senderId', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
@@ -230,6 +232,30 @@ class FirestoreService {
               .map((doc) => FriendRequestModel.fromMap(doc.data()))
               .toList(),
         );
+  }
+
+  // ✅ BARU: one-time fetch untuk cek status awal
+  Future<FriendRequestModel?> getPendingRequest(
+    String senderId,
+    String receiverId,
+  ) async {
+    try {
+      final query = await _firestore
+          .collection('friend_requests')
+          .where('senderId', isEqualTo: senderId)
+          .where('receiverId', isEqualTo: receiverId)
+          .where('status', isEqualTo: 'pending')
+          .limit(1)
+          .get();
+      if (query.docs.isNotEmpty) {
+        return FriendRequestModel.fromMap(
+          query.docs.first.data() as Map<String, dynamic>,
+        );
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<FriendRequestModel?> getFriendRequest(
@@ -798,4 +824,72 @@ class FirestoreService {
       );
     }
   }
+
+  // Tambahkan method ini ke FirestoreService
+  Future<int> getUserPostsCount(String userId) async {
+    try {
+      final snapshot = await _firestore
+          .collection('motivations')
+          .where('user_id', isEqualTo: userId)
+          .count()
+          .get();
+      return snapshot.count ?? 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<int> getUserLikesCount(String userId) async {
+    try {
+      final doc = await _firestore.collection('users').doc(userId).get();
+      return doc.data()?['likes_count'] ?? 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<List<MotivationModel>> getUserPosts(
+    String userId, {
+    int limit = 5,
+  }) async {
+    try {
+      final snapshot = await _firestore
+          .collection('motivations')
+          .where('user_id', isEqualTo: userId)
+          .orderBy('created_at', descending: true)
+          .limit(limit)
+          .get();
+      return snapshot.docs
+          .map((doc) => MotivationModel.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+Future<void> createMotivation(MotivationModel motivation) async {
+  try {
+    final docRef = _firestore.collection('motivations').doc();
+
+    final motivationWithId = motivation.copyWith(
+      id: docRef.id,
+    );
+
+    await docRef.set(motivationWithId.toJson());
+  } catch (e) {
+    throw Exception('Gagal membuat motivasi: ${e.toString()}');
+  }
+}
+
+Stream<List<MotivationModel>> getMotivationsStream() {
+  return _firestore
+      .collection('motivations')
+      .orderBy('created_at', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => MotivationModel.fromJson(doc.data()))
+            .toList(),
+      );
+}
 }

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:vigenesia/controllers/profile_controller.dart';
 import 'package:vigenesia/routes/app_routes.dart';
 import 'package:vigenesia/theme/app_theme.dart';
+import 'package:vigenesia/views/widgets/motivation_card.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});
@@ -10,31 +11,20 @@ class ProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text("Profil"),
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: Icon(Icons.arrow_back_ios),
-        ),
-        actions: [
-          Obx(
-            () => TextButton(
-              onPressed: controller.isEditing
-                  ? controller.toggleEditing
-                  : controller.toggleEditing,
-              child: Text(
-                controller.isEditing ? 'Batal' : "Edit",
-                style: TextStyle(
-                  color: controller.isEditing
-                      ? AppTheme.errorColor
-                      : AppTheme.primaryColor,
-                ),
-              ),
-            ),
+        backgroundColor: Colors.grey[50],
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          'Profil',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimaryColor,
           ),
-        ],
+        ),
+        automaticallyImplyLeading: false,
       ),
-
       body: Obx(() {
         final user = controller.currentuser;
         if (user == null) {
@@ -44,216 +34,181 @@ class ProfileView extends GetView<ProfileController> {
         }
 
         return SingleChildScrollView(
-          padding: EdgeInsets.all(24),
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
-                children: [
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundColor: AppTheme.primaryColor,
-                        child: user.photoURL.isNotEmpty
-                            ? ClipOval(
-                                child: Image.network(
-                                  user.photoURL,
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (content, error, stackTrace) {
-                                    return _buildDefaultAvatar(user);
-                                  },
-                                ),
-                              )
-                            : _buildDefaultAvatar(user),
-                      ),
-                      if (controller.isEditing)
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryColor,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: IconButton(
-                              onPressed: () {
-                                Get.snackbar(
-                                  'Info',
-                                  'Pembaruan foto akan segera hadir!',
-                                );
-                              },
-                              icon: Icon(
-                                Icons.camera_alt,
-                                size: 20,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  SizedBox(height:16),
-                  Text(
-                    user.displayName,
-                    style: Theme.of(Get.context!).textTheme.headlineSmall 
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                  SizedBox(height:4),
-                   Text(
-                    user.email,
-                    style: Theme.of(Get.context!).textTheme.bodyMedium 
-                        ?.copyWith(color: AppTheme.textSecondaryColor),
-                        ),
-                  SizedBox(height:8),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 4, horizontal:12),
-                    decoration: BoxDecoration(
-                      color: user.isOnline ? AppTheme.successColor.withOpacity(0.1)
-                      : AppTheme.textSecondaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
+              // Avatar
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.transparent,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppTheme.primaryColor,
+                      width: 3,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  ),
+                  child: user.photoURL.isNotEmpty
+                      ? ClipOval(
+                          child: Image.network(
+                            user.photoURL,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                _buildDefaultAvatar(user),
+                          ),
+                        )
+                      : Center(child: _buildDefaultAvatar(user)),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              // Nama
+              Text(
+                user.displayName,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 8),
+
+              // Bio
+              Text(
+                user.bio.isEmpty ? 'Tambahkan bio Anda' : user.bio,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+
+              // Stats
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Obx(
+                    () => Column(
                       children: [
-                        Container(
-                          height: 8,
-                          width: 8,
-                          decoration: BoxDecoration(
-                            color: user.isOnline
-                                ? AppTheme.successColor
-                                : AppTheme.textSecondaryColor,
-                                borderRadius: BorderRadius.circular(4),
+                        Text(
+                          '${controller.postsCount}',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
-                        SizedBox(width:6),
+                        SizedBox(height: 4),
                         Text(
-                          user.isOnline ? 'Online' : 'Offline',
-                          style: Theme.of(Get.context!).textTheme.bodySmall
-                              ?.copyWith(
-                                color: user.isOnline
-                                    ? AppTheme.successColor
-                                    : AppTheme.textSecondaryColor,
-                                    fontWeight: FontWeight.w600,
-                              ),
+                          'POS',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height:8),
-                  Text(
-                    controller.getJoinedData(),
-                    style: Theme.of(Get.context!).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondaryColor,
+                  SizedBox(width: 60),
+                  Obx(
+                    () => Column(
+                      children: [
+                        Text(
+                          '${controller.likesCount}',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'SUKA',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              SizedBox(height:32),
-              Obx(
-                () => Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Informasi Pribadi",
-                          style: Theme.of(Get.context!).textTheme.headlineSmall
-                              ?.copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                        SizedBox(height:20),
-                        TextFormField(
-                          controller: controller.displayNameController,
-                          enabled: controller.isEditing,
-                          decoration: InputDecoration(
-                            labelText: 'Nama Tampilan',
-                            prefixIcon: Icon(Icons.person_outline),
-                          ),
-                        ),
-                        SizedBox(height:16),
-                          TextFormField(
-                          controller: controller.emailController,
-                          enabled: false,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: Icon(Icons.email_outlined),
-                            helperText: 'Alamat email tidak dapat diubah',
-                          ),
-                        ),
-                        if(controller.isEditing)...[
-                          SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: controller.isLoading
-                                  ? null
-                                  : controller.updateProfile,
-                                  child:  controller.isLoading
-                                      ? SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white
-                                        ),
-                                      )
-                                    : Text("Simpan Perubahan"),
-                            ),
-                          ),
-                        ],
-                      ],
+              SizedBox(height: 24),
+
+              // Edit Profil Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Get.toNamed(AppRoutes.editProfile),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
                     ),
+                  ),
+                  child: Text(
+                    'Edit Profil',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
                 ),
               ),
               SizedBox(height: 32),
-              Card(
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(
-                        Icons.security,
-                        color: Colors.deepPurple,
-                      ),
-                      title: Text("Ubah Kata Sandi"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () => Get.toNamed(AppRoutes.changePassword),
-                    ),
-                    Divider(height: 1,color: Colors.grey),
-                       ListTile(
-                      leading: Icon(
-                        Icons.delete_forever,
-                        color: AppTheme.errorColor,
-                      ),
-                      title: Text("Hapus Akun"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: controller.deleteAccount,
-                    ),
-                     Divider(height: 1,color: Colors.grey),
-                       ListTile(
-                      leading: Icon(
-                        Icons.logout,
-                        color: AppTheme.errorColor,
-                      ),
-                      title: Text("Keluar"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: controller.signOut,
-                    ),
-                  ],
+
+              // Postingan Sebelumnya
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Postingan Sebelumnya',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              SizedBox(height: 20),
-              Text(
-                "Vigenesia v1.0.0",
-                style: Theme.of(Get.context!).textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondaryColor,
-                ),
+              SizedBox(height: 12),
+
+              Obx(
+                () => controller.userPosts.isEmpty
+                    ? SizedBox(
+                        height: 200,
+                        child: Center(
+                          child: Text(
+                            'Belum ada postingan',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: controller.userPosts.length,
+                        itemBuilder: (context, index) {
+                          final motivation = controller.userPosts[index];
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 12),
+                            child: MotivationCard(
+                              motivation: motivation,
+                              timeAgo: controller.formatTimeAgo(
+                                motivation.createdAt,
+                              ),
+                              onLike: null,
+                            ),
+                          );
+                        },
+                      ),
               ),
             ],
           ),
@@ -266,9 +221,9 @@ class ProfileView extends GetView<ProfileController> {
     return Text(
       user.displayName.isNotEmpty ? user.displayName[0].toUpperCase() : '?',
       style: TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.w600,
-        fontSize: 32,
+        color: AppTheme.primaryColor,
+        fontWeight: FontWeight.bold,
+        fontSize: 40,
       ),
     );
   }

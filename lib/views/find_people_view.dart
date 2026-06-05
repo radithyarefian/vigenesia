@@ -8,7 +8,7 @@ class FindPeopleView extends GetView<UsersListController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Mencari Orang'), leading: SizedBox()),
+      appBar: AppBar(title: Text('Cari Orang'), leading: SizedBox()),
       body: Column(
         children: [
           _buildSearchBar(),
@@ -108,20 +108,21 @@ class FindPeopleView extends GetView<UsersListController> {
             SizedBox(height: 24),
             Text(
               controller.seacrhQuery.isNotEmpty
-                  ? 'No results found'
-                  : 'No people found',
+                  ? 'Tidak ada hasil ditemukan'
+                  : 'Tidak ada pengguna ditemukan',
               style: Theme.of(Get.context!).textTheme.headlineMedium?.copyWith(
                 color: AppTheme.textPrimaryColor,
                 fontWeight: FontWeight.bold,
               ),
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 8),
             Text(
               controller.seacrhQuery.isNotEmpty
-                  ? 'Try a different search term'
-                  : 'All users will show here',
+                  ? 'Coba kata kunci pencarian lain'
+                  : 'Semua pengguna akan ditampilkan di sini',
               style: Theme.of(Get.context!).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textPrimaryColor,
+                color: AppTheme.textSecondaryColor,
               ),
               textAlign: TextAlign.center,
             ),

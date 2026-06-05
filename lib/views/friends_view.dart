@@ -89,7 +89,7 @@ class FriendsView extends GetView<FriendsController> {
                       lastSeenText: controller.getLastSeenText(friend),
                       onTap: () => controller.startChat(friend),
                       onRemove: () => controller.removeFriend(friend),
-                      onBlock: () => controller.blockFriend(friend,)
+                      onBlock: () => controller.blockFriend(friend),
                     );
                   },
                 );
@@ -124,8 +124,8 @@ class FriendsView extends GetView<FriendsController> {
             SizedBox(height: 24),
             Text(
               controller.searchQuery.isNotEmpty
-                  ? 'No friends found'
-                  : 'No friends yet',
+                  ? 'Tidak ada teman ditemukan'
+                  : 'Belum ada teman',
               style: Theme.of(Get.context!).textTheme.headlineMedium?.copyWith(
                 color: AppTheme.textPrimaryColor,
                 fontWeight: FontWeight.bold,
@@ -134,8 +134,8 @@ class FriendsView extends GetView<FriendsController> {
             SizedBox(height: 8),
             Text(
               controller.searchQuery.isNotEmpty
-                  ? 'Try a different search term'
-                  : 'Add friends to start chating with them',
+                  ? 'Coba kata kunci pencarian lain'
+                  : 'Tambahkan teman untuk mulai mengobrol dengan mereka',
               style: Theme.of(Get.context!).textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondaryColor,
               ),
@@ -145,7 +145,12 @@ class FriendsView extends GetView<FriendsController> {
               SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: controller.openFriendRequest,
-                label: Text('View friend Requests'),
+                label: Text(
+                  'Lihat Permintaan Pertemanan',
+                  style: TextStyle(fontSize: 13),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 icon: Icon(Icons.person_search),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryColor,
